@@ -1,0 +1,138 @@
+<div class="navbar-fixed-bottom control-panel">
+  <label>分类： 
+  <select ng-model="type" ng-change="setType()">
+	<option value="public_timeline">最新的公共微博</option>
+	<option value="friends_timeline">关注用户的微博</option>
+	<option value="user_timeline">我发布的微博</option>
+	<option value="mentions">@ 我的微博</option>
+	<option value="bilateral_timeline">与我互相关注的用户的微博</option>
+  </select></label>
+  <label>每隔：<span>{{interval}}秒</span>
+  <input type="range" ng-model="interval" min="0" max="6" step="1" ng-change="setInterval()"/></label>
+
+  <label>更新：<span>{{count}}条</span>
+  <input type="range" ng-model="count" min="10" max="100" step="10" ng-change="setType()"/></label>
+	<br/>
+  <label>搜索： <input ng-model="query"></label>
+
+  <label>排序：
+  <select ng-model="orderProp">
+	<option value="-created_at">最新</option>
+	<option value="-reposts_count">转发数</option>
+	<option value="-comments_count">评论数</option>
+	<option value="-attitudes_count">表态数</option>
+  </select></label>
+  <button ng-click="reverseOrder()" value="逆序">倒序</button>
+  <label><span my-current-time="'y-M-d HH:mm:ss'"></span>
+  <a href="javascript:;" id="wb_connect_btn" > </a></label>
+</div>
+<div class="container-fluid" style="margin: 40px 0 100px -23px">
+  <div class="row-fluid">
+      <!--Body content-->
+      <ul class="weibo" id="weibo-list" infinite-scroll="loadMore()">
+		<li ng-repeat="status in statuses | filter:query | orderBy:orderProp" class="thumbnail">
+		  <div class="li_wrap clearFix">
+			<div class="usericon">
+			  <span class="showtip">
+				<a class="user_head" href="//weibo.com/{{status.user.id}}">
+				  <img ng-src="{{status.user.profile_image_url}}">
+				</a>
+			  </span>
+			</div>
+			<div class="mainContent commentWrap">
+			  <div class="userName">
+				<a class="getUserTimelineBtn" href="//weibo.com/{{status.user.id}}">
+				  {{status.user.screen_name}}
+				</a>
+				<span ng-show="status.user.verified" title="{{status.user.verified_reason}}">V</span>
+				<span class="edit">
+				  <span class="repostCounts">
+					<a href="" class="showRepostTimelineBtn" title="View retweet timeline">Fw( {{status.reposts_count}} )</a>
+					</span>
+				  <span class="commentCounts">
+					<a href="" class="showCommentsBtn" title="View comments">Cm( {{status.comments_count}} )</a>
+				  </span>
+				</span>
+			  </div>
+			  <div class="msg">
+				<div class="tweet">
+				  <div class="tweet_text">
+					{{status.text}}
+				  </div>
+				  <div>
+					<a class="thumbnail_pic" href="{{status.original_pic}}" target="_blank" title="Right click to open the original image">
+					  <img class="imgicon pic" ng-src="{{status.thumbnail_pic}}">
+					</a>
+				  </div>
+				  <!-- 转发 -->
+<div class="msg" ng-show="status.retweeted_status.id> 0">
+	<div class="tweetItem retweeted commentWrap">
+		<div class="userName">
+			Fw
+			<span class="showtip">
+				@{{status.retweeted_status.user.screen_name}}
+				<span ng-show="status.user.verified" title="{{status.user.verified_reason}}">V</span>
+			</span>
+			's tweet:
+		</div>
+		<div class="tweet_text">
+			{{status.retweeted_status.text}}
+		</div>
+		<div>
+			<a href="{{status.retweeted_status.original_pic}}" title="Right click to open the original image">
+				<img class="imgicon pic" ng-src="{{status.retweeted_status.thumbnail_pic}}">
+			</a>
+		</div>
+		<!-- {{retweeted_retweeted_status_in}} -->
+		<div class="msgInfo">
+			<a href="">{{status.retweeted_status.created_at| strToDate| date:'yyyy-MM-dd HH:mm:ss'}}
+			</a>
+			via
+			<span ng-bind-html-unsafe="status.retweeted_status.source"></span>
+		</div>
+		<div class="comments">
+			<p style="text-align:right;">
+				<a href="" class="comment_hide_list_btn">
+					Hide comments
+				</a>
+			</p>
+			<ul class="comment_list">
+			</ul>
+			<div class="comment_paging">
+				<a class="pre_page commentPageBtn" href="" style="display:none;">
+					《Previous
+				</a>
+				<a class="next_page commentPageBtn" href="" style="display:none;">
+					Next》
+				</a>
+			</div>
+			<br>
+		</div>
+	</div>
+</div>
+				  <!-- /转发 -->
+				</div>
+			  </div>
+			  <!-- <div class="comments">
+				<p style="text-align:right;">
+				  <a href="" class="comment_hide_list_btn">
+					Hide comments
+				  </a>
+				</p>
+				<ul class="comment_list">
+				</ul>
+			  </div> -->
+			  <div class="msgInfo">
+				<a href="">
+				  {{status.created_at| strToDate| date:'yyyy-MM-dd HH:mm:ss'}}
+				</a>
+				via
+				<span ng-bind-html-unsafe="status.source"></span>
+			  </div>
+			</div>
+		  </div>
+		  <!-- end .li_wrap -->
+		</li>
+      </ul>
+  </div>
+</div>
